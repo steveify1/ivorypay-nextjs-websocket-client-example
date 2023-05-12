@@ -6,6 +6,29 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
+body {
+  font-size: 16px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: none;
+}
+
+ul li:not(:last-child) {
+  margin-bottom: 1em;
+}
+
+ul li span {
+  font-weight: 600;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+}
+
 a {
   color: inherit;
   text-decoration: none;

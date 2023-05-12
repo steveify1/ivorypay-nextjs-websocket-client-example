@@ -1,8 +1,45 @@
 import Head from 'next/head'
 import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import styles from '../styles/Home.module.css';
+import { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
+import { useRouter } from 'next/router';
+import axios from 'axios';
 
 export default function Home() {
+  const apiBaseUrl = 'http://localhost:7000';
+  const [transaction, setTransaction] = useState();
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationError, setVerificationError] = useState('');
+  const router = useRouter();
+
+  const handleVerification = async () => {
+    if (isVerifying) return;
+    setIsVerifying(true);
+    try {
+      const { data } = await axios.get(`${apiBaseUrl}/v1/transactions/${transaction.reference}/verify`);
+      setTransaction(data.data);
+      setVerificationError('');
+    } catch (error) {
+      setVerificationError(error.response?.data?.message || 'Omo! Monitor don spoil? Please retry..lol');
+    }
+    setIsVerifying(false);
+  }
+
+  useEffect(() => {
+    if (router.query.tnxId) {
+      const socket = io(`${apiBaseUrl}/${router.query.tnxId}`);
+      socket.on('updated', (data) => {
+        console.log(data);
+        setTransaction(data);
+      });
+  
+      socket.on('rehydrated', (data) => {
+        console.log('Just rehydrated!');
+      });
+    }
+  }, [router.query.tnxId]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -13,43 +50,40 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
+          Odogwu's Monitor
         </h1>
 
         <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
+          Listening for changes on transaction with ID {' '}
+          <br />
+          <code className={styles.code}>{router.query.tnxId}</code>
         </p>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+        <ul>
+          <li><span>Reference:</span> {transaction?.reference}</li>
+          <li>
+            <span>Status:</span> {" "}
+            {transaction ? (<a
+              className={`${styles.status} ${styles[transaction?.status]}`}
+            >
+              {transaction?.status}
+            </a>) : null}
+          </li>
+          <li><span>Crypto:</span> {transaction?.crypto}</li>
+          <li><span>Address:</span> {transaction?.address}</li>
+          <li><span>Total expected amount:</span> {transaction?.expectedAmountInCryptoPlusFee}</li>
+        </ul>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
+        {transaction ? (<>
+          <button
+            className={styles.verifyButton}
+            disabled={isVerifying}
+            onClick={handleVerification}
           >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+            {isVerifying ? 'Laying claim...' : 'Verify'}
+          </button>
+          <p className={styles.verifyError}>{verificationError}</p>
+        </>): null}
       </main>
 
       <footer className={styles.footer}>
