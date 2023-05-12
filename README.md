@@ -26,3 +26,4 @@ The following events occur as the state of a transaction changes or specifically
 - `expired`: Fired when a transaction expires.
 - `awaiting_arrival`: This is fired when the status of the transaction changes to `awaiting_arrival`. See details above.
 - `pending_settlement`: Fired when the balance of the address of the transanction on the blockchain is a non-zero value. In order to confidently give value to the sender, ensure that the blockchain balance is equal to the tokens the sender is expected to send.
+- `blockchain_check`: Fired after each round of blockchain check for the balance of the transaction address.
