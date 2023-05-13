@@ -8,7 +8,7 @@ npm run dev
 yarn dev
 ```
 
-Open [http://localhost:3000?tnxId=<YOUR_TRANSACTION_ID_GOES_HERE>](http://localhost:3000?tnxId=<YOUR_TRANSACTION_ID_GOES_HERE>) with your browser to see the result.
+Open [http://localhost:3000?tnxId=YOUR_TRANSACTION_ID_GOES_HERE](http://localhost:3000?tnxId=YOUR_TRANSACTION_ID_GOES_HERE) with your browser to see the result.
 
 ## Transaction status
 - `success`: The payment has been received and the business wallet balances has been updated
